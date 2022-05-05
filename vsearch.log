@@ -1,0 +1,2 @@
+ImmutableMultiDict([('phrase', 'zfa'), ('letters', 'aeiou')]) | 127.0.0.1 | Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36 | {'a'}
+ImmutableMultiDict([('phrase', 'how ara uou'), ('letters', 'aeiou')]) | 127.0.0.1 | Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36 | {'a', 'o', 'u'}
