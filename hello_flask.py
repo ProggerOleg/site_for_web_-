@@ -1,8 +1,30 @@
-from flask import Flask, render_template, request, escape
+from flask import Flask, render_template, request, session
 from vsearch4web import search4letters
 import sqlite3 as sq
+from checker import check_logged_in
+
 
 app = Flask(__name__)
+
+
+@app.route("/login")
+def login():
+    return render_template("login.html", title="Авторизация")
+
+@app.route("/register")
+def register():
+    return render_template("register.html", title="Регистрация")
+
+#@app.route('/login')
+#def do_login() -> str:
+#    session['logged_in'] = True
+#    return "You are now logged in"
+
+
+#@app.route('/logout')
+#def do_logout() -> str:
+#    session.pop('logged_in')
+#    return "You are now logged out"
 
 
 @app.route('/search4', methods=['POST'])
@@ -25,20 +47,24 @@ def entry_page() -> 'html':
     return render_template('entry.html',
                            the_title='Welcome to search4letters on the web!')
 
+@app.errorhandler(404)
+def pageNotFount(error):
+    return render_template('page404.html', the_title="Страница не найдена")
+
 
 @app.route('/viewlog')
+@check_logged_in
 def view_log() -> 'html':
     content = []
-    with open('vsearch.log') as log:
-        for line in log:
-            content.append([])
-            for item in line.split('|'):
-                content[-1].append(escape(item))
-    titles = ('Form Data', 'Remote_addr', 'User_agent', 'Results')
+    with sq.connect('log.db') as con:
+        cur = con.cursor()
+        cur.execute("SELECT * FROM log")
+        rows = cur.fetchall()
+    titles = ('id', 'ts', 'Phrase', 'Letters', 'ip', 'browser_string', 'Results')
     return render_template('viewlog.html',
                            the_title='View Log',
                            the_row_titles=titles,
-                           the_data=content,)
+                           the_data=rows,)
 
 
 def log_request(req: 'flask_request', res: str) -> None:
@@ -60,6 +86,7 @@ def log_request(req: 'flask_request', res: str) -> None:
         print("Records created successfully")
         cur.close()
 
+app.secret_key = 'Ding_dong'
 
 if __name__ == '__main__':
     app.run(debug=True)
