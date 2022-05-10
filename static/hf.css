@@ -1,7 +1,35 @@
 body {
-    background: linear-gradient(90deg, #b9deed, #efefef);
-    vertical-align: middle;
-    margin-left: 100px;
-    margin-right: 100px;
+    background-color: #D1E8E2;
     }
+
+.b-bar {
+	position: sticky;
+	background-color: #57BA98 ;
+	background-size: cover;
+	text-align: right;
+	color: white;
+}
+.navigation{
+    color: red;
+    text-align:center;
+}
+.form-contact{
+    text-align:center;
+    }
+.greating_u{
+    padding-top:50px
+    }
+h1, h2{
+    text-align:center;
+    }
+
+.form-contact label {
+         display: inline-block;
+         min-width: 80px;
+}
+
+.form-contact p {margin: 10px 0 10px 0;}
+.form-contact input[type=submit], textarea {
+         font-size: 16px;
+}
 

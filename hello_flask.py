@@ -1,30 +1,49 @@
-from flask import Flask, render_template, request, session
+from flask import Flask, render_template, request, session, flash
 from vsearch4web import search4letters
 import sqlite3 as sq
 from checker import check_logged_in
 
-
 app = Flask(__name__)
 
 
-@app.route("/login")
-def login():
-    return render_template("login.html", title="Авторизация")
+@app.route("/login", methods=["POST", "GET"])
+def do_login() -> 'html':
+    if request.method == 'POST':
+        login = request.form.get('email')
+        password = request.form.get('psw')
+        with sq.connect('users.db') as db:
+            cur = db.cursor()
+            cur.execute("SELECT login, password FROM users")
+            if (login, password) in cur.fetchall():
+                flash("You are logged in now")
+                session['logged_in'] = True
+            else:
+                flash("Wrong login or password")
+    return render_template("login.html", the_title="Авторизация")
 
-@app.route("/register")
-def register():
-    return render_template("register.html", title="Регистрация")
 
-#@app.route('/login')
-#def do_login() -> str:
-#    session['logged_in'] = True
-#    return "You are now logged in"
-
-
-#@app.route('/logout')
-#def do_logout() -> str:
-#    session.pop('logged_in')
-#    return "You are now logged out"
+@app.route("/register", methods=["GET", "POST"])
+def register() -> 'html':
+    if request.method == 'POST':
+        reg = request.form.get('email')
+        with sq.connect('users.db') as db:
+            cur = db.cursor()
+            cur.execute("""CREATE TABLE IF NOT EXISTS users (
+                                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                name varchar (32) not null,
+                                login varchar (32) not null,
+                                password varchar (32) not null
+                            );""")
+            cur.execute("SELECT login FROM users")
+            if reg in cur.fetchall():
+                flash("You already have an account")
+            elif request.form['psw'] != request.form['psw2']:
+                flash("Try to insert passwords again")
+            elif reg not in cur.fetchall():
+                do_register(request)
+                flash("Your account has been created")
+                session['logged_in'] = True
+    return render_template("register.html", the_title="Регистрация")
 
 
 @app.route('/search4', methods=['POST'])
@@ -42,29 +61,35 @@ def do_search() -> 'html':
 
 
 @app.route('/')
+def greating_page():
+    return render_template('greating.html',
+                           the_title='Welcome to search4letters on the web!')
+
+
 @app.route('/entry')
 def entry_page() -> 'html':
     return render_template('entry.html',
                            the_title='Welcome to search4letters on the web!')
 
+
 @app.errorhandler(404)
-def pageNotFount(error):
+def pageNotFound(error):
     return render_template('page404.html', the_title="Страница не найдена")
 
 
 @app.route('/viewlog')
 @check_logged_in
 def view_log() -> 'html':
-    content = []
-    with sq.connect('log.db') as con:
-        cur = con.cursor()
-        cur.execute("SELECT * FROM log")
-        rows = cur.fetchall()
-    titles = ('id', 'ts', 'Phrase', 'Letters', 'ip', 'browser_string', 'Results')
-    return render_template('viewlog.html',
-                           the_title='View Log',
-                           the_row_titles=titles,
-                           the_data=rows,)
+    if session["logged_in"] is True:
+        with sq.connect('log.db') as con:
+            cur = con.cursor()
+            cur.execute("SELECT * FROM log")
+            rows = cur.fetchall()
+        titles = ('id', 'ts', 'Phrase', 'Letters', 'ip', 'browser_string', 'Results')
+        return render_template('viewlog.html',
+                               the_title='View Log',
+                               the_row_titles=titles,
+                               the_data=rows,)
 
 
 def log_request(req: 'flask_request', res: str) -> None:
@@ -86,7 +111,22 @@ def log_request(req: 'flask_request', res: str) -> None:
         print("Records created successfully")
         cur.close()
 
-app.secret_key = 'Ding_dong'
+
+def do_register(req):
+    with sq.connect('users.db') as db:
+        cur = db.cursor()
+        cur.execute("""CREATE TABLE IF NOT EXISTS users (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name varchar (32) not null,
+                    login varchar (32) not null,
+                    password varchar (32) not null
+                );""")
+        cur.execute("""INSERT INTO users(name, login, password) VALUES(?, ?, ?)""", (req.form['name'],
+                                                                                         req.form['email'],
+                                                                                         req.form["psw"]))
+
+
+app.secret_key = 'FijdkdajdsfaskUU2'
 
 if __name__ == '__main__':
     app.run(debug=True)
