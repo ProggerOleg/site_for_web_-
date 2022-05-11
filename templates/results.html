@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
 {% block body %}
-
+<br>
 <h2> {{the_title}} </h2>
-
+<div class="res">
 <p>You submitted following data:</p>
 <table border="1">
     <tr><td width="75">Phrase:</td><td width="200">{{the_phrase}}</td></tr>
     <tr><td width="75">Letters</td><td width="200">{{the_letters}}</td></tr>
 </table>
-
+<br>
 <p>When "{{the_phrase}} is search for "{{ the_letters }}", the following results are returned:</p>
-    <h3>{{the_results}}</h3>
+    <h3>{{the_results}}</h3></div>
 {% endblock %}

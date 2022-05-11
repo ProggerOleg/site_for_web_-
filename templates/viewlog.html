@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
 
 {% block body %}
-
+<br>
 <h2>{{ the_title }}</h2>
+<div class="log">
 <table border="1">
     <tr>
         {% for row_title in the_row_titles %}
@@ -16,7 +17,7 @@
             {% endfor %}
         </tr>
     {% endfor %}
-</table>
+</table></div>
 
 {% endblock %}
 

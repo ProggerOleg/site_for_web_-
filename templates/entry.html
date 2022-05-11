@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 {% block body %}
+<br>
 <h2> {{ the_title }} </h2>
 <br>
 <form method="POST" action="/search4" class="form-contact">
-
     <p>Use this form to submit a search request:</p>
     <p><label>Phrase: </label> <input name='phrase' type="TEXT" width='60' requied />
     <p><label>Letters: </label> <input name='letters' type="TEXT" value='aeiou' requied />
